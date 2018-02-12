@@ -94,7 +94,6 @@ exports.accept= function(mysql, con, client, msg, args){
 	if(idList==="")
 		return;
 	idList = idList.slice(0,-1);
-	console.log(idList);
 	var sql = "SELECT ans.* FROM answer ans LEFT JOIN accepted acc ON ans.id = acc.id WHERE acc.id IS NULL AND ans.id IN ("+idList+");";
 	sql += "INSERT IGNORE INTO accepted (id) SELECT id FROM answer WHERE id IN("+idList+");";
 	sql += "DELETE FROM declined WHERE id IN ("+idList+")";

@@ -46,19 +46,21 @@ client.on('message',msg => {
 	if(isCommand){
 		const command = args.shift().toLowerCase();
 
-		//Eightball!
-		if(msg.content[msg.content.length-1] === '?'){
-			ball.ask(con,msg,isMention,prefix);
-		}
-
 		//Suggests a new answer
-		else if(command === 'add'|| command === 'suggest'){
+		if(command === 'add'|| command === 'suggest'){
 			approval.send(mysql, con,msg, client.users.get(auth.admin), args.join(' '),false);
 		}
 
 		//Suggests a new answer anonymously
 		else if(command === 'addanon'|| command === 'suggestanon'){
 			approval.send(mysql, con,msg, client.users.get(auth.admin), args.join(' '),true);
+		}
+
+		//Eightball!
+		else if(msg.content[msg.content.length-1] === '?'){
+			ball.ask(con,msg,isMention,prefix);
+			isCommand = false;
+			console.log("Command: ? {"+args+"} by "+msg.author.username+"["+msg.guild.name+"]["+msg.channel.name+"]");
 		}
 
 		//Displays all the commands
@@ -73,6 +75,9 @@ client.on('message',msg => {
 
 		//If not a command...
 		else if(isMention) msg.channel.send("Type '8b help' for help!");
+
+		if(isCommand)
+			console.log("Command: "+command+" {"+args+"} ["+msg.guild.name+"]["+msg.channel.name+"]"+msg.author.username);
 	}
 });
 
