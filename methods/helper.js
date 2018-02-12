@@ -26,6 +26,7 @@ exports.showHelp = function(channel){
 			"\n```md\n< 8b help \n>\tDisplays this commands list!"+
 			"\n\n< 8b {question}?\n>\treplies as a yes/no answer\n>\te.g. `8b Am I cute?`"+
 			"\n\n< 8b add {new answer}\n>\tSuggests a new yes/no answer to this eightball!\n>\te.g. `8b add ofc not!`"+
+			"\n\n< 8b addanon {new answer}\n>\tSuggests a new yes/no answer anonymously to this eightball!\n>\te.g. `8b addanon Never!`"+
 			"\n\n< 8b link\n>\tWant to add the bot to another server?? :D```"+
 			"\n\n```# Remove brackets when typing commands\n# [] = optional arguments\n# {} = optional user input```";
 	channel.send(embed);

@@ -2,6 +2,7 @@ const Discord = require("discord.js");
 const client = new Discord.Client();
 const helper = require("./methods/helper.js");
 const approval = require("./methods/approval.js");
+const ball = require("./methods/ball.js");
 var auth = require('../tokens/eightball-auth.json');
 var login = require('../tokens/eightball-login.json');
 var prefix = "8b";
@@ -18,9 +19,9 @@ client.on('message',msg => {
 			approval.accept(mysql, con, client, msg, adminMsg);
 		}
 
-		else if(adminCommand === 'deny'){
+		else if(adminCommand === 'decline'){
 			//Deny new answer 
-			//approval.deny();
+			approval.decline(mysql, con, client, msg, adminMsg);
 		}
 	}
 
@@ -47,7 +48,7 @@ client.on('message',msg => {
 
 		//Eightball!
 		if(msg.content[msg.content.length-1] === '?'){
-			//eightball.ask(con,msg,isMention,prefix);
+			ball.ask(con,msg,isMention,prefix);
 		}
 
 		//Suggests a new answer
@@ -87,7 +88,8 @@ var con = mysql.createConnection({
 	database: "eightball",
 	supportBigNumbers: true,
 	bigNumberStrings: true,
-	multipleStatements: true
+	multipleStatements: true,
+	charset: "utf8mb4"
 });
 
 //Display log when connected to mysql
