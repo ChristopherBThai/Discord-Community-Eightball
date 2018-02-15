@@ -6,6 +6,7 @@ const ball = require("./methods/ball.js");
 var auth = require('../tokens/eightball-auth.json');
 var login = require('../tokens/eightball-login.json');
 var prefix = "8b";
+var prefix2 = "8ball";
 
 client.on('message',msg => {
 	//Special admin commands via DM
@@ -13,15 +14,19 @@ client.on('message',msg => {
 		var adminMsg = msg.content.trim().split(/ +/g);
 		const adminCommand = adminMsg.shift().toLowerCase();
 
-		//Reply to a feedback/report/suggestion
+		//Accept new answer
 		if(adminCommand === 'accept'){
-			//Accept new answer
-			approval.accept(mysql, con, client, msg, adminMsg);
+			approval.accept(mysql, con, client, msg, adminMsg, adminMsg.shift().toLowerCase());
 		}
 
+		//Deny new answer 
 		else if(adminCommand === 'decline'){
-			//Deny new answer 
-			approval.decline(mysql, con, client, msg, adminMsg);
+			approval.decline(mysql, con, client, msg, adminMsg, adminMsg.shift().toLowerCase());
+		}
+		
+		//Changes answer types
+		else if(adminCommand === 'update'||adminCommand === 'set'){
+			approval.set(con,msg,adminMsg,adminMsg.shift().toLowerCase());
 		}
 	}
 
@@ -32,9 +37,15 @@ client.on('message',msg => {
 	var args = "";
 	var isMention = false;
 	var isCommand = false;
-	//Check for 'owo' prefix
-	if(msg.content.toLowerCase().indexOf(prefix) === 0){
+	var used = "";
+	//Check for '8b' prefix
+	if(msg.content.toLowerCase().indexOf(prefix2) === 0){
+		args = msg.content.slice(prefix2.length).trim().split(/ +/g);
+		var used = prefix2;
+		isCommand = true;
+	}else if(msg.content.toLowerCase().indexOf(prefix) === 0){
 		args = msg.content.slice(prefix.length).trim().split(/ +/g);
+		var used = prefix;
 		isCommand = true;
 	}else if(msg.mentions.users.has(client.user.id)){
 		args = msg.content.substring(msg.content.indexOf(" ")).trim().split(/ +/g);;
@@ -58,14 +69,19 @@ client.on('message',msg => {
 
 		//Eightball!
 		else if(msg.content[msg.content.length-1] === '?'){
-			ball.ask(con,msg,isMention,prefix);
+			ball.ask(con,msg,isMention,used);
 			isCommand = false;
 			console.log("Command: ? {"+args+"} by "+msg.author.username+"["+msg.guild.name+"]["+msg.channel.name+"]");
 		}
 
 		//Displays all the commands
-		else if(command === "help" || command === "command"){
+		else if(command === "help" || command === "command" || command === "info"){
 			helper.showHelp(msg.channel);
+		}
+
+		//Displays info
+		else if(command === "stats" || command === "stat"){
+			helper.showStats(con,msg);
 		}
 
 		//Display link for discord invite

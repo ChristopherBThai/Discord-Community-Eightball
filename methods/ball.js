@@ -11,7 +11,15 @@
  * @param {boolean}		isMention - if the command was called as a mention or not
  */
 exports.ask = function(con,msg,isMention,prefix){
-	var sql = "SELECT * FROM answer WHERE id = (SELECT a1.id FROM accepted AS a1 JOIN (SELECT (RAND() * (SELECT MAX(num) FROM accepted)) AS num) AS a2 WHERE a1.num >= a2.num ORDER BY a1.num ASC LIMIT 1);";
+	var rand = Math.random();
+	var type = "o";
+	if(rand<=.35)
+		type = "y";
+	else if (rand<=.7)
+		type = "n";
+	else if (rand<=.85)
+		type = "m";
+	var sql = "SELECT * FROM (SELECT answer.*,@rownum := @rownum + 1 AS rank FROM answer NATURAL JOIN accepted, (SELECT @rownum := 0) r WHERE type = '"+type+"') d WHERE rank <= (CEIL(RAND()*(SELECT COUNT(*) FROM answer NATURAL JOIN accepted WHERE type = '"+type+"'))) ORDER BY rank DESC LIMIT 1;"
 	con.query(sql,function(err,rows,field){
 		if(err) throw err;
 		var question = msg.content;

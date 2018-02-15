@@ -83,11 +83,16 @@ exports.send = function(mysql, con, msg, admin, message,anon){
  * @param {discord.Client} 	client	-  Discord.js client
  * @param {discord.Message}	msg 	-  the msg from discord
  * @param {string} 		args	-  The arguments of the command
+ * @param {string} 		type  	-  The type of answer
  *
  */
-exports.accept= function(mysql, con, client, msg, args){
+exports.accept= function(mysql, con, client, msg, args, type){
 	var dm = msg.channel;
 	var idList = "";
+	if(!(type==="y"||type==="n"||type==="m"||type==="o")){
+		dm.send("Not a valid type");
+		return;
+	}
 	for (i in args)
 		if(isInt(args[i]))
 			idList += args[i] + ",";
@@ -96,6 +101,7 @@ exports.accept= function(mysql, con, client, msg, args){
 	idList = idList.slice(0,-1);
 	var sql = "SELECT ans.* FROM answer ans LEFT JOIN accepted acc ON ans.id = acc.id WHERE acc.id IS NULL AND ans.id IN ("+idList+");";
 	sql += "INSERT IGNORE INTO accepted (id) SELECT id FROM answer WHERE id IN("+idList+");";
+	sql += "UPDATE IGNORE answer SET type = '"+type+"' WHERE id IN("+idList+");"
 	sql += "DELETE FROM declined WHERE id IN ("+idList+")";
 
 	idList = "";
@@ -155,11 +161,16 @@ exports.accept= function(mysql, con, client, msg, args){
  * @param {discord.Client} 	client	-  Discord.js client
  * @param {discord.Message}	msg 	-  the msg from discord
  * @param {string} 		args	-  The arguments of the command
+ * @param {string} 		type  	-  The type of answer
  *
  */
-exports.decline = function(mysql, con, client, msg, args){
+exports.decline = function(mysql, con, client, msg, args, type){
 	var dm = msg.channel;
 	var idList = "";
+	if(!(type==="y"||type==="n"||type==="m"||type==="o")){
+		dm.send("Not a valid type");
+		return;
+	}
 	for (i in args)
 		if(isInt(args[i]))
 			idList += args[i] + ",";
@@ -169,6 +180,7 @@ exports.decline = function(mysql, con, client, msg, args){
 	console.log(idList);
 	var sql = "SELECT ans.* FROM answer ans LEFT JOIN declined decl ON ans.id = decl.id WHERE decl.id IS NULL AND ans.id IN ("+idList+");";
 	sql += "INSERT IGNORE INTO declined (id) SELECT id FROM answer WHERE id IN("+idList+");";
+	sql += "UPDATE IGNORE answer SET type = '"+type+"' WHERE id IN("+idList+");"
 	sql += "DELETE FROM accepted WHERE id IN ("+idList+")";
 
 	idList = "";
@@ -194,7 +206,7 @@ exports.decline = function(mysql, con, client, msg, args){
 					"fields": [
 						{
 							"name":"Sorry! Your answer has been declined!",
-							"value": "==============================================="
+							"value": "Only yes/no/maybe answers are accepted\n==============================================="
 						},{
 							"name": "Answer ID",
 							"value": declined[i].id,
@@ -222,6 +234,32 @@ exports.decline = function(mysql, con, client, msg, args){
 }
 
 
+/**
+ * Declines an answer
+ * @param {mysql.Connection} 	con 	-  MySql.createConnection()
+ * @param {discord.Message}	msg 	-  the msg from discord
+ * @param {string} 		args	-  The arguments of the command
+ * @param {string} 		type  	-  The type of answer
+ *
+ */
+exports.set = function(con, msg, args, type){
+	var dm = msg.channel;
+	var idList = "";
+	if(!(type==="y"||type==="n"||type==="m"||type==="o")){
+		dm.send("Not a valid type");
+		return;
+	}
+	for (i in args)
+		if(isInt(args[i]))
+			idList += args[i] + ",";
+	idList = idList.slice(0,-1);
+	var sql = "UPDATE IGNORE answer SET type = '"+type+"' WHERE id IN("+idList+");"
+	con.query(sql,function(err,rows,field){
+		if(err) throw err;
+		dm.send("Updated to '"+type+"' for: ["+idList+"]");
+	});
+}
+	
 
 /**
  * Checks if its an integer
