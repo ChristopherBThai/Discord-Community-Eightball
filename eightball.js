@@ -1,10 +1,15 @@
+var auth = require('../tokens/eightball-auth.json');
+var login = require('../tokens/eightball-login.json');
+
 const Discord = require("discord.js");
 const client = new Discord.Client();
+const DBL = require("dblapi.js");
+const dbl = new DBL(auth.dbl);
+
 const helper = require("./methods/helper.js");
 const approval = require("./methods/approval.js");
 const ball = require("./methods/ball.js");
-var auth = require('../tokens/eightball-auth.json');
-var login = require('../tokens/eightball-login.json');
+
 var prefix = "8b";
 var prefix2 = "8ball";
 
@@ -81,7 +86,7 @@ client.on('message',msg => {
 
 		//Displays info
 		else if(command === "stats" || command === "stat"){
-			helper.showStats(con,msg);
+			helper.showStats(client,con,msg);
 		}
 
 		//Display link for discord invite
@@ -126,6 +131,9 @@ client.on('ready',()=>{
 	console.log('Logged in as '+client.user.tag+'!');
 	console.log('Bot has started, with '+client.users.size+' users, in '+client.channels.size+' channels of '+client.guilds.size+' guilds.');
 	client.user.setActivity('with '+client.guilds.size+' Servers! | \n\'8b help\' for help!');
+	setInterval(() => {
+		dbl.postStats(client.guilds.size);
+	}, 3200000);
 });
 
 //When bot joins a new guild

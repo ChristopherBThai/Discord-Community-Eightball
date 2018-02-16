@@ -23,12 +23,12 @@ exports.isInt = function(value){
  */
 exports.showHelp = function(channel){
 	const embed = "I'm an eightball bot! All my answers are created by **you**, the Discord community!!!\n\n**Commands**"+ 
-			"\n```md\n< 8b help \n>\tDisplays this commands list!"+
-			"\n\n< 8b {question}?\n>\treplies as a yes/no answer\n>\te.g. `8b Am I cute?`"+
+			"\n```md\n< 8b {question}?\n>\treplies as a yes/no answer\n>\te.g. `8b Am I cute?`"+
 			"\n\n< 8b add {new answer}\n>\tSuggests a new yes/no answer to this eightball!\n>\te.g. `8b add ofc not!`"+
 			"\n\n< 8b addanon {new answer}\n>\tSuggests a new yes/no answer anonymously to this eightball!\n>\te.g. `8b addanon Never!`"+
-			"\n\n< 8b link\n>\tWant to add the bot to another server?? :D```"+
-			"\n\n< 8b stats\n>\tDisplays the bot stats```"+
+			"\n\n< 8b link\n>\tWant to add the bot to another server?? :D"+
+			"\n\n< 8b stats\n>\tDisplays the bot stats"+
+			"\n\n< 8b help \n>\tDisplays this commands list!```"+
 			"\n```# Remove brackets when typing commands\n# {} = user input```";
 	channel.send(embed);
 }
