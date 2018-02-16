@@ -19,27 +19,42 @@
 exports.send = function(mysql, con, msg, admin, message,anon){
 	var sender = msg.author;
 	var channel = msg.channel;
+
+	//Check if there is a message
 	if(!message||message === ''){
 		channel.send("Silly "+sender + ", add your new answer first!"); 
 		return;
 	}
 
+	//Check anonymous
 	var anonMsg = "";
 	var anonymous = 0;
 	if(anon){
 		anonymous = 1;
 		anonMsg = " anonymously";
 	}
+
+	//SQL statement
 	var sql = "INSERT INTO answer (msg,userId,username,anon) values ("+
 		"?,"+
 		sender.id+","+
 		"?,"+
 		anonymous+");";
+
+	//Check message size
 	if(message.length > 100){
 		console.log("\tMessage too big");
 		channel.send("Sorry! Messages must be under 100 character!!!");
 		return;
 	}
+	
+	//Remove brackets if user typed them in
+	message = message.trim();
+	if(message.charAt(0)==='{')
+		message = message.substring(1);
+	if(message.charAt(message.length-1)==='}')
+		message = message.substring(0,message.length-1);
+
 	var mysqlformat = [message,sender.username];
 	sql = mysql.format(sql,mysqlformat);
 	con.query(sql,function(err,rows,field){
@@ -177,7 +192,6 @@ exports.decline = function(mysql, con, client, msg, args, type){
 	if(idList==="")
 		return;
 	idList = idList.slice(0,-1);
-	console.log(idList);
 	var sql = "SELECT ans.* FROM answer ans LEFT JOIN declined decl ON ans.id = decl.id WHERE decl.id IS NULL AND ans.id IN ("+idList+");";
 	sql += "INSERT IGNORE INTO declined (id) SELECT id FROM answer WHERE id IN("+idList+");";
 	sql += "UPDATE IGNORE answer SET type = '"+type+"' WHERE id IN("+idList+");"

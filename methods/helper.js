@@ -28,6 +28,7 @@ exports.showHelp = function(channel){
 			"\n\n< 8b add {new answer}\n>\tSuggests a new yes/no answer to this eightball!\n>\te.g. `8b add ofc not!`"+
 			"\n\n< 8b addanon {new answer}\n>\tSuggests a new yes/no answer anonymously to this eightball!\n>\te.g. `8b addanon Never!`"+
 			"\n\n< 8b link\n>\tWant to add the bot to another server?? :D```"+
+			"\n\n< 8b stats\n>\tDisplays the bot stats```"+
 			"\n```# Remove brackets when typing commands\n# {} = user input```";
 	channel.send(embed);
 }
@@ -37,10 +38,24 @@ exports.showHelp = function(channel){
  * @param {mysql.connection}	con
  * @param {discord.message}	msg
  */
-exports.showStats = function(con, msg){
-	var sql = "SELECT COUNT(*) AS count FROM answer NATURAL JOIN accepted;";
+exports.showStats = function(client, con, msg){
+	var sql = "SELECT COUNT(*) total, "+
+		"sum(case when type = 'y' then 1 else 0 end) yes, "+
+		"sum(case when type = 'n' then 1 else 0 end) no, "+
+		"sum(case when type = 'm' then 1 else 0 end) maybe, "+
+		"sum(case when type = 'o' then 1 else 0 end) other "+
+		"FROM answer NATURAL JOIN accepted;";
+	sql += "SELECT COUNT(*) total, "+
+		"sum(case when type = 'y' then 1 else 0 end) yes, "+
+		"sum(case when type = 'n' then 1 else 0 end) no, "+
+		"sum(case when type = 'm' then 1 else 0 end) maybe, "+
+		"sum(case when type = 'o' then 1 else 0 end) other, "+
+		"sum(case when type IS NULL then 1 else 0 end) pending "+
+		"FROM answer;";
 	con.query(sql,function(err,rows,field){
 		if(err) throw err;
+		answer = rows[0][0];
+		all = rows[1][0];
 		const embed = {
 		"description": "Here's a little bit of information! If you need help with commands, type `8b help`.",
 			"color": 1,
@@ -49,13 +64,13 @@ exports.showStats = function(con, msg){
 				"url": "https://discordapp.com",
 				"icon_url": "https://cdn.discordapp.com/embed/avatars/0.png"},
 			"fields": [{"name": "Number of Answers",
-					"value": "```md\n<Total:  84>\n<Yes:    32>\n<No:     21>\n<Maybe:  12>\n<Other:  21>\n```",
+					"value": "```md\n<Total:  "+answer.total+">\n<Yes:    "+answer.yes+">\n<No:     "+answer.no+">\n<Maybe:  "+answer.maybe+">\n<Other:  "+answer.other+">\n<```",
 					"inline": true},
 				{"name": "Number of Submitions",
-					"value": "```md\n<Total:   84>\n<Yes:     32>\n<No:      21>\n<Maybe:   12>\n<Other:   21>\n<Pending: 23>```",
+					"value": "```md\n<Total:   "+all.total+">\n<Yes:     "+all.yes+">\n<No:      "+all.no+">\n<Maybe:   "+all.maybe+">\n<Other:   "+all.other+">\n<Pending: "+all.pending+">```",
 					"inline": true},
 				{"name": "Bot Information",
-					"value": "```md\n<Guilds:    84>\n<Channels:  32>\n<Users:     21>``````md\n<Ping:       32ms>\n<UpdatedOn:  3-22-12>\n<Uptime:     32>```"
+					"value": "```md\n<Guilds:    "+client.guilds.size+">\n<Channels:  "+client.channels.size+">\n<Users:     "+client.users.size+">``````md\n<Ping:       "+client.ping+"ms>\n<UpdatedOn:  "+client.readyAt+">\n<Uptime:     "+client.uptime+">```"
 				}]
 		};
 		msg.channel.send({embed});
