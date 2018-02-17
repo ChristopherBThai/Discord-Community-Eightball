@@ -3,6 +3,7 @@
 //||		OTHER METHODS		  ||
 //||					  ||
 //+========================================+
+const emoji = require("./emoji.js");
 
 /**
  * Eightball that replies as a yes/no answer
@@ -10,7 +11,7 @@
  * @param {discord.Message} 	msg - Discord's message
  * @param {boolean}		isMention - if the command was called as a mention or not
  */
-exports.ask = function(con,msg,isMention,prefix){
+exports.ask = function(client,con,msg,admin,isMention,prefix){
 	var rand = Math.random();
 	var type = "o";
 	if(rand<=.35)
@@ -31,13 +32,16 @@ exports.ask = function(con,msg,isMention,prefix){
 		if(rows[0].anon == 0)
 			creator = rows[0].username;
 
-		const embed = {
-			"description":""+rows[0].msg,
-			"color":1,
-			"footer":{"text":"Answer created by "+creator}
-		};
-		msg.channel.send("**"+msg.author+" asked:** "+question,{embed});
-		console.log("	question: "+question);
-		console.log("	answer: "+rows[0].msg);
+		emoji.check(client,rows[0].msg,admin)
+		.then(text => {
+			const embed = {
+				"description":""+text,
+				"color":1,
+				"footer":{"text":"Answer created by "+creator}
+			};
+			msg.channel.send("**"+msg.author+" asked:** "+question,{embed});
+			console.log("	question: "+question);
+			console.log("	answer: "+rows[0].msg);
+		});
 	});
 }

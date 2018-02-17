@@ -22,7 +22,7 @@ exports.isInt = function(value){
  *
  */
 exports.showHelp = function(channel){
-	const embed = "I'm an eightball bot! All my answers are created by **you**, the Discord community!!!\n\n**Commands**"+ 
+	const embed = "I'm an eightball bot! All my answers are created by **you**, the Discord community!!!\nEmojis and animated emojis are accepted!!!\n\n**Commands**"+ 
 			"\n```md\n< 8b {question}?\n>\treplies as a yes/no answer\n>\te.g. `8b Am I cute?`"+
 			"\n\n< 8b add {new answer}\n>\tSuggests a new yes/no answer to this eightball!\n>\te.g. `8b add ofc not!`"+
 			"\n\n< 8b addanon {new answer}\n>\tSuggests a new yes/no answer anonymously to this eightball!\n>\te.g. `8b addanon Never!`"+
@@ -63,7 +63,9 @@ exports.showStats = function(client, con, msg){
 			"author": {"name": "Community 8Ball Information",
 				"url": "https://discordapp.com",
 				"icon_url": "https://cdn.discordapp.com/embed/avatars/0.png"},
-			"fields": [{"name": "Number of Answers",
+			"fields": [{"name":"Current Guild",
+					"value":"```md\n<channelID: "+msg.channel.id+">\n<guildID:   "+msg.guild.id+">```"},
+				{"name": "Number of Answers",
 					"value": "```md\n<Total:  "+answer.total+">\n<Yes:    "+answer.yes+">\n<No:     "+answer.no+">\n<Maybe:  "+answer.maybe+">\n<Other:  "+answer.other+">\n<```",
 					"inline": true},
 				{"name": "Number of Submitions",

@@ -9,6 +9,7 @@ const dbl = new DBL(auth.dbl);
 const helper = require("./methods/helper.js");
 const approval = require("./methods/approval.js");
 const ball = require("./methods/ball.js");
+const admin = require("./methods/admin.js");
 
 var prefix = "8b";
 var prefix2 = "8ball";
@@ -32,6 +33,11 @@ client.on('message',msg => {
 		//Changes answer types
 		else if(adminCommand === 'update'||adminCommand === 'set'){
 			approval.set(con,msg,adminMsg,adminMsg.shift().toLowerCase());
+		}
+
+		//Grab certain answer
+		else if(adminCommand === 'grab'){
+			admin.grab(client,con,msg,adminMsg[0],client.users.get(auth.admin));
 		}
 	}
 
@@ -74,7 +80,7 @@ client.on('message',msg => {
 
 		//Eightball!
 		else if(msg.content[msg.content.length-1] === '?'){
-			ball.ask(con,msg,isMention,used);
+			ball.ask(client,con,msg,client.users.get(auth.admin),isMention,used);
 			isCommand = false;
 			console.log("Command: ? {"+args+"} by "+msg.author.username+"["+msg.guild.name+"]["+msg.channel.name+"]");
 		}
@@ -92,6 +98,11 @@ client.on('message',msg => {
 		//Display link for discord invite
 		else if(command === "invite" || command === "link"){
 			helper.showLink(msg.channel);
+		}
+
+		//Admin command to debug
+		else if(msg.author.id === auth.admin && command === 'grab'){
+			admin.grab(client,con,msg,args[0],client.users.get(auth.admin));
 		}
 
 		//If not a command...
