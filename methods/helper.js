@@ -56,17 +56,18 @@ exports.showStats = function(client, con, msg){
 		if(err) throw err;
 		answer = rows[0][0];
 		all = rows[1][0];
+		var declined = parseInt(all.total)-(parseInt(answer.total)+parseInt(all.pending));
 		const embed = {
 		"description": "Here's a little bit of information! If you need help with commands, type `8b help`.",
 			"color": 1,
 			"timestamp": "2018-02-15T05:21:04.460Z",
 			"author": {"name": "Community 8Ball Information",
-				"url": "https://discordapp.com",
-				"icon_url": "https://cdn.discordapp.com/embed/avatars/0.png"},
+				"url": "https://discordapp.com/api/oauth2/authorize?client_id=410537337513050133&permissions=2048&scope=bot",
+				"icon_url": "https://cdn.discordapp.com/app-icons/410537337513050133/69bef083bd93cb2213cd0912489118e8.png"},
 			"fields": [{"name":"Current Guild",
 					"value":"```md\n<channelID: "+msg.channel.id+">\n<guildID:   "+msg.guild.id+">```"},
 				{"name": "Number of Answers",
-					"value": "```md\n<Total:  "+answer.total+">\n<Yes:    "+answer.yes+">\n<No:     "+answer.no+">\n<Maybe:  "+answer.maybe+">\n<Other:  "+answer.other+">\n<```",
+					"value": "```md\n<Total:    "+answer.total+">\n<Yes:      "+answer.yes+">\n<No:       "+answer.no+">\n<Maybe:    "+answer.maybe+">\n<Other:    "+answer.other+">\n<Declined: "+declined+">```",
 					"inline": true},
 				{"name": "Number of Submitions",
 					"value": "```md\n<Total:   "+all.total+">\n<Yes:     "+all.yes+">\n<No:      "+all.no+">\n<Maybe:   "+all.maybe+">\n<Other:   "+all.other+">\n<Pending: "+all.pending+">```",

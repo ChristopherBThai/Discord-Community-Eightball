@@ -20,9 +20,10 @@ exports.ask = function(client,con,msg,admin,isMention,prefix){
 		type = "n";
 	else if (rand<=.85)
 		type = "m";
-	var sql = "SELECT * FROM (SELECT answer.*,@rownum := @rownum + 1 AS rank FROM answer NATURAL JOIN accepted, (SELECT @rownum := 0) r WHERE type = '"+type+"') d WHERE rank <= (CEIL(RAND()*(SELECT COUNT(*) FROM answer NATURAL JOIN accepted WHERE type = '"+type+"'))) ORDER BY rank DESC LIMIT 1;"
+	var sql = "SET @rand = (CEIL(RAND()*(SELECT COUNT(*) FROM answer NATURAL JOIN accepted WHERE type = '"+type+"')));SELECT * FROM (SELECT answer.*,@rownum := @rownum + 1 AS rank FROM answer NATURAL JOIN accepted, (SELECT @rownum := 0) r WHERE type = '"+type+"') d WHERE rank <= @rand ORDER BY rank DESC LIMIT 1;"
 	con.query(sql,function(err,rows,field){
 		if(err) throw err;
+		rows = rows[1];
 		var question = msg.content;
 		if(isMention)
 			question = question.substring(question.indexOf(" ")+1);
